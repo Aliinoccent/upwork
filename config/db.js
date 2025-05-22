@@ -9,4 +9,7 @@ const pool=new Pool({
     dbName:process.env.DB_NAME
 
 })
+
+
+
 module.exports=pool

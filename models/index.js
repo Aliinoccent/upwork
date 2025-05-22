@@ -6,6 +6,7 @@ const {employeeJob}=require('./employJob')
 const {applicent}=require('./applicent')
 const {contracts} =require("./contracts")
 const {milestone}=require('./milestone')
+const {messeges}=require('./messeges')
 const allTables = async () => {
 
     try {
@@ -31,6 +32,9 @@ const allTables = async () => {
         
         await pool.query(milestone);
             console.log('milestone table');
+
+        await pool.query(messeges);
+        console.log('messeges table');
     }
     catch (error) {
         console.log('catch error', error)

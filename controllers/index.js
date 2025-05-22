@@ -1,7 +1,8 @@
 
-const {createUser,login,regenrateToken,usersActiveBehaviour}=require('./users');
+const {createUser,login,regenrateToken,usersActiveBehaviour,getallContractData, getAllfreelancers,getAllemployees,logout,forget,isUserValid,newPassword}=require('./users');
 const {profileCreate}=require("./profile")
-const {createEmployeeJob,applicant,jobDetails,employeSeeApplicents,contracts,milestone,allJobs,milestoneStatusUpdate}=require('./jobs')
+const {createEmployeeJob,applicant,jobDetails,employeSeeApplicents,contracts,milestone,allJobs,milestoneStatusUpdate,contractId}=require('./jobs')
+const {messages,sendMessage}=require('./messages');
 module.exports={
     createUser,
     login,
@@ -15,5 +16,15 @@ module.exports={
     contracts,
     milestone,
     allJobs,
-    milestoneStatusUpdate
+    milestoneStatusUpdate,
+    contractId,
+    messages,
+    sendMessage,
+    getallContractData,
+    getAllfreelancers,
+    getAllemployees,
+    logout,
+    forget,
+    isUserValid,
+    newPassword
 }

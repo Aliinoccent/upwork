@@ -1,9 +1,20 @@
-const express=require("express")
-const app=express();
+
 const router=require('./routers/index')
-const pool=require('./config/db');
+const {server,app,express} =require( "./socket/socket")
+const pool =require('./config/db');
 const allTables =require('./models/index')
-allTables();
+const cors=require("cors")
+
 app.use(express.json())
+app.use(cors({
+  origin: 'http://127.0.0.1:5500', 
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], 
+}));
+
+
+
+allTables();
 app.use('/',router)
-app.listen(3000)
+
+
+server.listen(3000)

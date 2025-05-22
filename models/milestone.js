@@ -6,4 +6,5 @@ status varchar(255) default 'pending',
 description varchar(255),
 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+payment boolean ,
 contracts_id int references contracts(contracts_id) on delete cascade)`

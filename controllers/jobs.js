@@ -1,6 +1,6 @@
 const pool = require('../config/db');
-
-
+const {jobsubmit}=require("../bullMq/production")
+const {worker}=require('../middelwares/nodemailer_job_Notification')
 exports.createEmployeeJob = async (req, res) => {
 
     try {
@@ -13,12 +13,14 @@ exports.createEmployeeJob = async (req, res) => {
         if (role === 'freelancer') {
             return res.status(403).json("only employee create job");
         }
-
+        jobsubmit({title, description, budget, skills_required, deadline, user_id})
         await pool.query("insert into employee_job(title,description,budget,skills_required ,deadline,user_id) values($1,$2,$3,$4,$5,$6)", [title, description, budget, skills_required, deadline, user_id])
-        res.json("job created successfully")
+       return res.json("job created successfully");
+
 
     } catch (error) {
         console.log(error)
+        return res.status(500).json({error})
     }
 }
 exports.applicant = async (req, res) => {
@@ -197,5 +199,20 @@ exports.milestoneStatusUpdate = async (req, res) => {
 
         console.error("Error in milestoneStatusUpdate:", error);
         return res.status(500).json({ error: 'Internal server error' });
+    }
+}
+exports.contractId=async(req,res)=>{
+    try {
+        const {id} =req.params;
+        console.log(id)
+        const iscontractExists= await pool.query("select * from contracts where contracts_id=$1",[id]);
+        if(!iscontractExists.rowCount){
+            return res.status(403).json({message:"not have contract"});
+        }
+        return res.status(200).json({message:iscontractExists.rows[0]});
+        
+    }
+    catch(error){
+        res.status(500).json({error});
     }
 }

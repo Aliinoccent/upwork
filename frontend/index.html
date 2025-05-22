@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chatting</title>
+  <style>
+    .container {
+      height: 400px;
+      width: 400px;
+      border: 2px solid black;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      overflow-y: auto;
+      flex: 1;
+    }
+    input {
+      height: 50px;
+      width: calc(100% - 60px);
+      padding-left: 10px;
+      font-size: 20px;
+    }
+    #btn {
+      background-color: blueviolet;
+      color: white;
+      border-radius: 20px;
+      padding: 0 15px;
+      margin-left: 5px;
+      border: none;
+      cursor: pointer;
+    }
+    .input-row {
+      display: flex;
+      padding: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div>
+   <h2>contract_id</h2> 
+   <input type="number">
+   <button>contract</button>
+  </div>
+  <div class="main">
+    <div class="container">
+      <ul id="ul"></ul>
+      <div class="input-row">
+        <input type="text" id="input" placeholder="Type a message…" />
+        <button id="btn">Send</button>
+      </div>
+    </div>
+    
+  </div>
+
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script>
+    // connect to your server (adjust port if needed)
+    const socket = io('http://localhost:3000', {
+      transports: ['websocket','polling'],
+      withCredentials: true
+    });
+
+    const ul = document.getElementById('ul');
+    const input = document.getElementById('input');
+    const btn = document.getElementById('btn');
+
+    // emit messages on click
+    btn.addEventListener('click', () => {
+      const text = input.value.trim();
+      if (!text) return;
+
+      sendMessage(text);
+      input.value = '';
+    });
+
+    // listen for incoming messages
+    socket.on('message', msg => {
+      const li = document.createElement('li');
+      li.textContent = msg;
+      ul.appendChild(li);
+      // scroll to bottom
+      ul.scrollTop = ul.scrollHeight;
+    });
+
+    socket.on('connect', () => {
+      console.log('✅ Connected!', socket.id);
+    });
+    async function fetchContract(id) {
+  try {
+    const res = await fetch(`http://localhost:3000/job/contractfound/${id}`,{
+      method:"post",
+      headers:{
+        Authorization: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImVtcGxveWVlNEBnbWFpbC5jb20iLCJpYXQiOjE3NDc4MDM1MTUsImV4cCI6MTc0NzgwNzExNX0.nTG5H_aX9vXotpNlg7l-T0NrVoBSbkn42IDRs1w2YvA",
+      }
+    })
+
+    const data = await res.json();
+    console.log('Contract data:', data);
+    return data;
+  } catch (err) {
+    console.error('Fetch failed:', err);
+  }
+}
+fetchContract(8);
+
+ async function sendMessage(text,id) {
+  try {
+    const token= "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImVtcGxveWVlNEBnbWFpbC5jb20iLCJpYXQiOjE3NDc4MDM1MTUsImV4cCI6MTc0NzgwNzExNX0.nTG5H_aX9vXotpNlg7l-T0NrVoBSbkn42IDRs1w2YvA"
+    const res = await fetch(`http://localhost:3000/messages/${id}`,{
+      method:"post",
+      headers:{
+       
+         'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+      }
+    })
+
+    const data = await res.json();
+    console.log('Contract data:', data);
+    return data;
+  } catch (err) {
+    console.error('Fetch failed:', err);
+  }
+}
+  </script>
+</body>
+</html>

@@ -23,6 +23,7 @@ if(!verifyUser){
 }
  const Userauth=await pool.query('select user_id , user_name , role , created_at from users where email=$1',[verifyUser.email]);
  req.user=Userauth.rows[0];
+ console.log(Userauth.rows[0],'this is auth user now')
  next();
   } catch (error) {
     console.log(error)
