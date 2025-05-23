@@ -13,10 +13,6 @@ exports.createUser = async (req, res) => {
     console.log(user_name, email, password, role)
     try {
         await pool.connect();
-        if (!user_name || !email || !password || !role) {
-            return res.status(400).json({ messege: 'required all filed' })
-        }
-
         const dbUser = await pool.query(`select * from users where email=$1`, [email]);
         console.log(dbUser.rows[0])
         if (dbUser.rows[0]) {

@@ -15,7 +15,7 @@ exports.createEmployeeJob = async (req, res) => {
         }
         jobsubmit({title, description, budget, skills_required, deadline, user_id})
         await pool.query("insert into employee_job(title,description,budget,skills_required ,deadline,user_id) values($1,$2,$3,$4,$5,$6)", [title, description, budget, skills_required, deadline, user_id])
-       return res.json("job created successfully");
+       return res.json({title, description, budget, skills_required, deadline, user_id,message:"create job successfully"});
 
 
     } catch (error) {
@@ -91,16 +91,16 @@ exports.contracts = async (req, res) => {
         if (role === 'freelancer') {
             return res.status(403).json("only employee make contract");
         }
-        const isjob = await pool.query("select * from employee_job where job_id=$1", [job_id]);
+        const isjob = await pool.query('select * from employee_job where user_id=$1 and job_id=$2',[user_id,job_id]);
         const isJobExists = isjob.rows[0];
-
+        console.log(isjob.rows[0])
         if (!isJobExists) {
-            res.status(404).json("job not exests");
+            res.status(404).json("this job not exests from your profile");
         }
-        const isFreelancer = await pool.query('select * from  freelancerProfile where freelancer_profile_id=$1', [freelancer_id])
+        const isFreelancer = await pool.query('select * from applicent where user_id=$1 and job_id=$2', [freelancer_id,job_id])
         const isFreelancerExists = isFreelancer.rows[0];
         if (!isFreelancerExists) {
-            return res.status(404).json("freelancer not exists");
+            return res.status(404).json("freelancer not exists in your applicents");
         }
         // *************check kerna ha ke isi employee ne job create ki****************
 
@@ -109,7 +109,7 @@ exports.contracts = async (req, res) => {
             res.status(400).json("employe not have own job");
         }
         if (isAuthEmp.rows[0]?.job_id) {
-            return res.status(403).json('contract created  by this job');
+            return res.status(403).json('contract already created  by this job');
         }
         await pool.query("insert into contracts(freelancer_profile_id,job_id,employProfileId) values($1,$2,$3)", [freelancer_id, job_id, user_id])
         res.status(200).json("contract successfully created");
@@ -120,11 +120,16 @@ exports.contracts = async (req, res) => {
 exports.milestone = async (req, res) => {
     try {
         const users = req.body;
-        console.log(users);
+        const {user_id,role}=req.user
+        console.log(users,role);
+
         // const isContractExist =await pool.query('select * from milestone inner join contracts on milestone.contracts_id= contracts.contracts_id  where contracts.contracts_id=$1',[users[0].contracts_id]);
-        const isContractExist = await pool.query('select * from contracts where contracts_id=$1', [users[0].contracts_id]);
+        if(role==='freelancer'){
+            return res.status(400).json({message:"only employee can create milestone"})
+        }
+        const isContractExist = await pool.query('select * from contracts where contracts_id=$1 and employProfileId=$2', [users[0].contracts_id,user_id]);
         if (!isContractExist.rows[0]) {
-            return res.status(403).json({ messege: " contract is not exists" });
+            return res.status(403).json({ messege: " contract is not exists from your account" });
         }
         const inMilestoneHasContractAlready = await pool.query("select * from milestone where contracts_id=$1", [users[0].contracts_id])
         if (inMilestoneHasContractAlready.rowCount) {
@@ -201,11 +206,10 @@ exports.milestoneStatusUpdate = async (req, res) => {
         return res.status(500).json({ error: 'Internal server error' });
     }
 }
-exports.contractId=async(req,res)=>{
+exports.getAllContracts=async(req,res)=>{
     try {
-        const {id} =req.params;
-        console.log(id)
-        const iscontractExists= await pool.query("select * from contracts where contracts_id=$1",[id]);
+        const {user_id} =req.user;
+        const iscontractExists= await pool.query("select * from contracts where employProfileId=$1",[user_id]);
         if(!iscontractExists.rowCount){
             return res.status(403).json({message:"not have contract"});
         }
@@ -213,6 +217,7 @@ exports.contractId=async(req,res)=>{
         
     }
     catch(error){
-        res.status(500).json({error});
+        console.log(error)
+       return res.status(500).json({error});
     }
 }
