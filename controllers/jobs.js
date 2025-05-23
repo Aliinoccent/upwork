@@ -1,6 +1,7 @@
 const pool = require('../config/db');
-const {jobsubmit}=require("../bullMq/production")
+const {jobsubmit,contractNotification}=require("../bullMq/production")
 const {worker}=require('../middelwares/nodemailer_job_Notification')
+const {workerContract}=require("../bullMq/contractWork")
 exports.createEmployeeJob = async (req, res) => {
 
     try {
@@ -110,7 +111,7 @@ exports.contracts = async (req, res) => {
         }
         if (isAuthEmp.rows[0]?.job_id) {
             return res.status(403).json('contract already created  by this job');
-        }
+        }contractNotification({freelancer_id,job_id,user_id});
         await pool.query("insert into contracts(freelancer_profile_id,job_id,employProfileId) values($1,$2,$3)", [freelancer_id, job_id, user_id])
         res.status(200).json("contract successfully created");
     } catch (error) {
