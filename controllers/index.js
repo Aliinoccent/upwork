@@ -1,8 +1,11 @@
 
-const {createUser,login,regenrateToken,usersActiveBehaviour,getallContractData, getAllfreelancers,getAllemployees,logout,forget,isUserValid,newPassword}=require('./users');
+// const {}=require('./users');
 const {profileCreate,profileUpdate}=require("./profile")
 const {createEmployeeJob,applicant,jobDetails,employeSeeApplicents,contracts,milestone,allJobs,milestoneStatusUpdate,getAllContracts}=require('./jobs')
+const {createUser,login,regenrateToken,usersActiveBehaviour,logout,forget,isUserValid,newPassword}=require('./auth')
+const { getallContractData, getAllfreelancers,getAllemployees}=require("./adminRole.js")
 const {messages,sendMessage}=require('./messages');
+
 module.exports={
     createUser,
     login,

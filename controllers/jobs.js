@@ -2,10 +2,11 @@ const pool = require('../config/db');
 const {jobsubmit,contractNotification}=require("../bullMq/production")
 const {worker}=require('../middelwares/nodemailer_job_Notification')
 const {workerContract}=require("../bullMq/contractWork")
+ 
 exports.createEmployeeJob = async (req, res) => {
 
     try {
-        pool.connect()
+      
         const { title, description, budget, skills_required, deadline } = req.body;
         if (!title || !description || !budget || !skills_required || !deadline) {
             return res.status(403).json({ messege: "all field are required" });
@@ -15,8 +16,8 @@ exports.createEmployeeJob = async (req, res) => {
             return res.status(403).json("only employee create job");
         }
         jobsubmit({title, description, budget, skills_required, deadline, user_id})
-        await pool.query("insert into employee_job(title,description,budget,skills_required ,deadline,user_id) values($1,$2,$3,$4,$5,$6)", [title, description, budget, skills_required, deadline, user_id])
-       return res.json({title, description, budget, skills_required, deadline, user_id,message:"create job successfully"});
+        const result=await pool.query("insert into employee_job(title,description,budget,skills_required ,deadline,user_id) values($1,$2,$3,$4,$5,$6) RETURNING *", [title, description, budget, skills_required, deadline, user_id])
+       return res.json({result:result.rows[0]});
 
 
     } catch (error) {

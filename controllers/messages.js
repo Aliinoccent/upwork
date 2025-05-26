@@ -2,7 +2,7 @@ const pool = require("../config/db");
 const{ getReceiverSocketId,io}=require('../socket/socket')
 
 exports.messages = async (req, res) => {
-    await pool.connect();
+    
     const { id: usertochatId } = req.params;
     const myId = req.user.user_id;
     try {

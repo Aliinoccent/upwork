@@ -1,6 +1,6 @@
 const pool = require('../config/db.js');
 exports.profileCreate = async (req, res) => {
-    pool.connect();
+    
     const { skil, bio, experince, companyName, description } = req.body;
     try {
 
@@ -30,8 +30,8 @@ exports.profileCreate = async (req, res) => {
             if (isexistsUser.rows[0]) {
                 return res.status(400).json({ message: "employee already created profile" });
             }
-            await pool.query('insert into employee_profile(companyname,description,employProfileId) values($1,$2,$3)', [companyName, description, user_id])
-            return res.status(200).json({ messege: "create profile" });;
+            const result=await pool.query('insert into employee_profile(companyname,description,employProfileId) values($1,$2,$3) returning *', [companyName, description, user_id])
+            return res.status(200).json({ messege: result.rows[0]});
         }
 
     } catch (error) {
