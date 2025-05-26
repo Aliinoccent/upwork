@@ -32,8 +32,13 @@ const worker = new Worker(
       });
       console.log(`Email sent to ${email}`);
     }
+    
   },
+    
   { connection }
 );
+worker.on('completed',(job)=>{
+    console.log('complete job',job.data);
+  }),
 
 module.exports = worker;

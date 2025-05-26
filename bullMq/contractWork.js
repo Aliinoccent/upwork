@@ -50,7 +50,9 @@ The Team
       console.log(`Email sent to ${email}`);
     
   },
+
   { connection }
 );
+
 
 module.exports = workerContract;
